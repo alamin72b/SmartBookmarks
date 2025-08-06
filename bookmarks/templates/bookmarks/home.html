@@ -1,0 +1,437 @@
+
+{% extends "bookmarks/base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<style>
+  .bookmark-hero {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(240, 147, 251, 0.1));
+    border-radius: 20px;
+    padding: 3rem 2rem;
+    text-align: center;
+    margin-bottom: 3rem;
+    border: 1px solid rgba(102, 126, 234, 0.2);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .bookmark-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+  }
+  
+  .bookmark-hero h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+    letter-spacing: -0.02em;
+  }
+  
+  .bookmark-hero p {
+    font-size: 1.1rem;
+    color: #4a5568;
+    max-width: 500px;
+    margin: 0 auto 2rem;
+    line-height: 1.6;
+  }
+  
+  .quick-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .quick-btn {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  }
+  
+  .quick-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  }
+  
+  .bookmark-showcase {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    margin-bottom: 3rem;
+  }
+  
+  .main-bookmarks {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+  
+  .sidebar-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .info-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+  
+  .section-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid rgba(102, 126, 234, 0.1);
+  }
+  
+  .section-icon {
+    font-size: 2.5rem;
+    margin-right: 1rem;
+  }
+  
+  .section-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0;
+  }
+  
+  .bookmark-grid {
+    display: grid;
+    gap: 1rem;
+  }
+  
+  .bookmark-card {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(240, 147, 251, 0.05));
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .bookmark-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(135deg, #667eea, #f093fb);
+    transform: scaleY(0);
+    transition: transform 0.3s ease;
+  }
+  
+  .bookmark-card:hover::before {
+    transform: scaleY(1);
+  }
+  
+  .bookmark-card:hover {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(240, 147, 251, 0.1));
+    border-color: rgba(102, 126, 234, 0.3);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 25px rgba(102, 126, 234, 0.15);
+  }
+  
+  .bookmark-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin-bottom: 0.5rem;
+    text-decoration: none;
+    display: block;
+    transition: color 0.3s ease;
+  }
+  
+  .bookmark-title:hover {
+    color: #667eea;
+  }
+  
+  .bookmark-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(102, 126, 234, 0.1);
+  }
+  
+  .bookmark-stats {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .stat-badge {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  
+  .bookmark-date {
+    color: #6b7280;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  
+  .stat-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #667eea, #f093fb);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+  
+  .stat-label {
+    color: #4a5568;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  
+  .categories-compact {
+    background: rgba(240, 147, 251, 0.1);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .categories-compact h4 {
+    color: #1a1a2e;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .category-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .category-item {
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: #4a5568;
+    border-left: 3px solid #f093fb;
+    transition: all 0.3s ease;
+  }
+  
+  .category-item:hover {
+    background: rgba(255, 255, 255, 0.9);
+    transform: translateX(3px);
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: #6b7280;
+  }
+  
+  .empty-state-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.6;
+  }
+  
+  .empty-state h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #4a5568;
+  }
+  
+  .empty-state p {
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+  }
+  
+  .empty-state a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border: 2px solid #667eea;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+  }
+  
+  .empty-state a:hover {
+    background: #667eea;
+    color: white;
+  }
+  
+  @media (max-width: 768px) {
+    .bookmark-showcase {
+      grid-template-columns: 1fr;
+    }
+    
+    .bookmark-hero {
+      padding: 2rem 1rem;
+    }
+    
+    .bookmark-hero h1 {
+      font-size: 2rem;
+    }
+    
+    .quick-actions {
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .quick-btn {
+      width: 100%;
+      max-width: 250px;
+      text-align: center;
+    }
+    
+    .main-bookmarks {
+      padding: 1.5rem;
+    }
+    
+    .bookmark-meta {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+  }
+</style>
+
+<div class="bookmark-hero">
+  <h1>🔖 Your Bookmark Collection</h1>
+  <p>Discover, organize, and access your favorite links with intelligent bookmark management</p>
+  <div class="quick-actions">
+    <a href="{% url 'upload_bookmark' %}" class="quick-btn">➕ Add New Bookmark</a>
+    <a href="{% url 'search' %}" class="quick-btn">🔍 Search Bookmarks</a>
+  </div>
+</div>
+
+<div class="bookmark-showcase">
+  <div class="main-bookmarks">
+    <div class="section-header">
+      <span class="section-icon">🔥</span>
+      <h2 class="section-title">Trending Bookmarks</h2>
+    </div>
+    
+    <div class="bookmark-grid">
+      {% for bookmark in popular_bookmarks %}
+        <div class="bookmark-card">
+          <a href="{% url 'bookmark_detail' bookmark.id %}" class="bookmark-title">{{ bookmark.title }}</a>
+          <div class="bookmark-meta">
+            <div class="bookmark-stats">
+              <span class="stat-badge">⏰ {{ bookmark.view_count }}</span>
+            </div>
+            <span class="bookmark-date">Popular</span>
+          </div>
+        </div>
+      {% empty %}
+        <div class="empty-state">
+          <div class="empty-state-icon">⭐</div>
+          <h3>No Popular Bookmarks Yet</h3>
+          <p>Start adding bookmarks and they'll appear here as they gain popularity!</p>
+          <a href="{% url 'upload_bookmark' %}">Add Your First Bookmark</a>
+        </div>
+      {% endfor %}
+    </div>
+    
+    <div class="section-header" style="margin-top: 3rem;">
+      <span class="section-icon">⏰</span>
+      <h2 class="section-title">Recently Added</h2>
+    </div>
+    
+    <div class="bookmark-grid">
+      {% if recent_bookmarks %}
+        {% for bm in recent_bookmarks %}
+          <div class="bookmark-card">
+            <a href="{% url 'bookmark_detail' bm.id %}" class="bookmark-title">{{ bm.title }}</a>
+            <div class="bookmark-meta">
+              <div class="bookmark-stats">
+                <span class="stat-badge">🆕 New</span>
+              </div>
+              <span class="bookmark-date">Recently added</span>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty-state">
+          <div class="empty-state-icon">🔖</div>
+          <h3>No Bookmarks Yet</h3>
+          <p>Your bookmark collection is empty. Start building your personal library!</p>
+          <a href="{% url 'upload_bookmark' %}">Add Your First Bookmark</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+  
+  <div class="sidebar-info">
+    <div class="info-card">
+      <div class="stat-number">{{ recent_bookmarks|length|default:"0" }}</div>
+      <div class="stat-label">Total Bookmarks</div>
+    </div>
+    
+    <div class="info-card">
+      <div class="stat-number">{{ popular_bookmarks|length|default:"0" }}</div>
+      <div class="stat-label">Popular Items</div>
+    </div>
+    
+    <div class="info-card">
+      <div class="stat-number">{{ categories|length|default:"0" }}</div>
+      <div class="stat-label">Categories</div>
+      
+      {% if categories %}
+      <div class="categories-compact">
+        <h4>📁 Quick Categories</h4>
+        <ul class="category-list">
+          {% for cat in categories|slice:":5" %}
+            <li class="category-item">{% include "bookmarks/_cat_node.html" with node=cat %}</li>
+          {% endfor %}
+          {% if categories|length > 5 %}
+            <li class="category-item" style="text-align: center; font-style: italic;">
+              <a href="{% url 'add_category' %}" style="color: #667eea;">View all categories...</a>
+            </li>
+          {% endif %}
+        </ul>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

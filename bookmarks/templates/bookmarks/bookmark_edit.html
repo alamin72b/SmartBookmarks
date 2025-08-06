@@ -1,0 +1,486 @@
+
+{# bookmarks/templates/bookmarks/bookmark_edit.html #}
+{% extends "bookmarks/base.html" %}
+{% block title %}Edit {{ bookmark.title }}{% endblock %}
+{% block content %}
+<style>
+  .edit-hero {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(240, 147, 251, 0.1));
+    border-radius: 20px;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(102, 126, 234, 0.2);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .edit-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+  }
+  
+  .edit-hero h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+    letter-spacing: -0.02em;
+  }
+  
+  .edit-hero p {
+    font-size: 1.1rem;
+    color: #4a5568;
+    max-width: 500px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+  
+  .edit-form {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 2.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .form-section {
+    margin-bottom: 2.5rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.03), rgba(240, 147, 251, 0.03));
+    border-radius: 16px;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+    position: relative;
+  }
+  
+  .form-section::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(135deg, #667eea, #f093fb);
+    border-radius: 0 4px 4px 0;
+  }
+  
+  .section-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid rgba(102, 126, 234, 0.1);
+  }
+  
+  .section-icon {
+    font-size: 2rem;
+    margin-right: 1rem;
+  }
+  
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0;
+  }
+  
+  /* Django form field styling */
+  .form-section p {
+    margin-bottom: 1.5rem;
+  }
+  
+  .form-section p label {
+    display: block;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+  }
+  
+  .form-section p input,
+  .form-section p textarea,
+  .form-section p select {
+    width: 100%;
+    padding: 1rem 1.25rem;
+    border: 2px solid rgba(102, 126, 234, 0.2);
+    border-radius: 12px;
+    font-size: 1rem;
+    background: rgba(255, 255, 255, 0.9);
+    transition: all 0.3s ease;
+    font-family: inherit;
+  }
+  
+  .form-section p input:focus,
+  .form-section p textarea:focus,
+  .form-section p select:focus {
+    outline: none;
+    border-color: #667eea;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    transform: translateY(-1px);
+  }
+  
+  .attachments-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1rem;
+  }
+  
+  .attachment-item {
+    background: linear-gradient(135deg, rgba(240, 147, 251, 0.05), rgba(102, 126, 234, 0.05));
+    border: 1px solid rgba(240, 147, 251, 0.2);
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .attachment-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(135deg, #f093fb, #667eea);
+    border-radius: 0 3px 3px 0;
+    transform: scaleY(0);
+    transition: transform 0.3s ease;
+  }
+  
+  .attachment-item:hover::before {
+    transform: scaleY(1);
+  }
+  
+  .attachment-item:hover {
+    background: linear-gradient(135deg, rgba(240, 147, 251, 0.1), rgba(102, 126, 234, 0.1));
+    border-color: rgba(240, 147, 251, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(240, 147, 251, 0.15);
+  }
+  
+  .delete-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+    transition: all 0.3s ease;
+  }
+  
+  .delete-checkbox:hover {
+    background: rgba(239, 68, 68, 0.15);
+  }
+  
+  .delete-checkbox input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: none;
+    transform: none;
+    box-shadow: none;
+  }
+  
+  .delete-checkbox label {
+    color: #dc2626;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin: 0;
+    cursor: pointer;
+  }
+  
+  .attachment-link {
+    color: #f093fb;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+  }
+  
+  .attachment-link:hover {
+    color: #e879f9;
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: #6b7280;
+    font-style: italic;
+    background: rgba(102, 126, 234, 0.05);
+    border-radius: 12px;
+    border: 1px dashed rgba(102, 126, 234, 0.3);
+  }
+  
+  .file-upload-area {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(240, 147, 251, 0.05));
+    border: 2px dashed rgba(102, 126, 234, 0.3);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+    cursor: pointer;
+  }
+  
+  .file-upload-area:hover {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(240, 147, 251, 0.1));
+    border-color: #667eea;
+    transform: translateY(-2px);
+  }
+  
+  .file-upload-area input[type="file"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 2;
+  }
+  
+  .file-upload-content {
+    pointer-events: none;
+    z-index: 1;
+    position: relative;
+  }
+  
+  .file-upload-text {
+    color: #4a5568;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+  
+  .file-upload-hint {
+    color: #6b7280;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+  
+  .file-upload-area.dragover {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(240, 147, 251, 0.15));
+    border-color: #667eea;
+    transform: scale(1.02);
+  }
+  
+  .submit-button {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 1rem 3rem;
+    border: none;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    max-width: 300px;
+    margin: 2rem auto 0;
+    display: block;
+  }
+  
+  .submit-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #764ba2, #f093fb);
+    transition: left 0.3s ease;
+    z-index: -1;
+  }
+  
+  .submit-button:hover::before {
+    left: 0;
+  }
+  
+  .submit-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  }
+  
+  .submit-button:active {
+    transform: translateY(-1px);
+  }
+  
+  @media (max-width: 768px) {
+    .edit-hero {
+      padding: 2rem 1rem;
+    }
+    
+    .edit-hero h1 {
+      font-size: 2rem;
+    }
+    
+    .edit-form {
+      padding: 1.5rem;
+      margin: 0 1rem;
+    }
+    
+    .form-section {
+      padding: 1.5rem;
+    }
+    
+    .section-header {
+      flex-direction: column;
+      text-align: center;
+      gap: 0.5rem;
+    }
+    
+    .section-icon {
+      margin-right: 0;
+    }
+    
+    .attachment-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+    
+    .submit-button {
+      width: 100%;
+      max-width: none;
+    }
+  }
+</style>
+
+<div class="edit-hero">
+  <h1>✏️ Edit Bookmark</h1>
+  <p>Update your bookmark details and manage attachments</p>
+</div>
+
+<form method="post" enctype="multipart/form-data" class="edit-form">
+  {% csrf_token %}
+  
+  <!-- Main Bookmark Details -->
+  <div class="form-section">
+    <div class="section-header">
+      <span class="section-icon">📝</span>
+      <h2 class="section-title">Bookmark Details</h2>
+    </div>
+    {{ form.as_p }}
+  </div>
+
+  <!-- Existing Attachments -->
+  <div class="form-section">
+    <div class="section-header">
+      <span class="section-icon">📎</span>
+      <h2 class="section-title">Existing Attachments</h2>
+    </div>
+    
+    {% if bookmark.files.all %}
+      <ul class="attachments-list">
+        {% for bf in bookmark.files.all %}
+          <li class="attachment-item">
+            <div class="delete-checkbox">
+              <input type="checkbox" name="delete_files" value="{{ bf.id }}" id="delete_{{ bf.id }}">
+              <label for="delete_{{ bf.id }}">🗑️ Delete</label>
+            </div>
+            <a href="{{ bf.file.url }}" target="_blank" class="attachment-link">
+              📄 {{ bf.file.name }}
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="empty-state">
+        <p>📭 No attachments yet</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Add New Files -->
+  <div class="form-section">
+    <div class="section-header">
+      <span class="section-icon">📁</span>
+      <h2 class="section-title">Add New Files</h2>
+    </div>
+    
+    <div class="file-upload-area" onclick="document.getElementById('new_files').click()">
+      <input type="file" name="new_files" id="new_files" multiple>
+      <div class="file-upload-content">
+        <div class="file-upload-text">📁 Choose new files to attach</div>
+        <div class="file-upload-hint">Click here or drag and drop files<br>Multiple files supported</div>
+      </div>
+    </div>
+    <div id="file-list" style="margin-top: 1rem; color: #4a5568; font-size: 0.9rem;"></div>
+  </div>
+
+  <button type="submit" class="submit-button">
+    💾 Save Changes
+  </button>
+</form>
+
+<script>
+  // File upload functionality
+  const fileInput = document.getElementById('new_files');
+  const fileList = document.getElementById('file-list');
+  const uploadArea = document.querySelector('.file-upload-area');
+  
+  // Handle file selection
+  fileInput.addEventListener('change', function(e) {
+    displaySelectedFiles(e.target.files);
+  });
+  
+  // Handle drag and drop
+  uploadArea.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    uploadArea.classList.add('dragover');
+  });
+  
+  uploadArea.addEventListener('dragleave', function(e) {
+    e.preventDefault();
+    uploadArea.classList.remove('dragover');
+  });
+  
+  uploadArea.addEventListener('drop', function(e) {
+    e.preventDefault();
+    uploadArea.classList.remove('dragover');
+    fileInput.files = e.dataTransfer.files;
+    displaySelectedFiles(e.dataTransfer.files);
+  });
+  
+  // Display selected files
+  function displaySelectedFiles(files) {
+    if (files.length === 0) {
+      fileList.innerHTML = '';
+      return;
+    }
+    
+    let fileNames = Array.from(files).map(file => 
+      `<span style="display: inline-block; background: rgba(102, 126, 234, 0.1); padding: 0.25rem 0.75rem; border-radius: 15px; margin: 0.25rem; border: 1px solid rgba(102, 126, 234, 0.2);">📄 ${file.name}</span>`
+    ).join('');
+    
+    fileList.innerHTML = `<div style="margin-top: 0.5rem;"><strong>New files selected:</strong><br>${fileNames}</div>`;
+  }
+</script>
+
+{% endblock %}

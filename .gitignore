@@ -1,0 +1,55 @@
+########################
+#  Python / Django     #
+########################
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.log
+
+# Virtual-envs & local env files
+venv/
+.env
+.env.*
+
+# SQLite (personal dev DB) – keep if you use Postgres/MySQL in prod
+db.sqlite3
+*.sqlite3-journal
+
+# Media & static artefacts generated at runtime
+media/
+uploads/
+staticfiles/
+static_root/
+
+# FAISS index & vector-map (auto-generated)
+faiss_index.bin
+faiss_vector_map.json
+
+########################
+#  Editors / IDEs      #
+########################
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+########################
+#  Packaging / Tests   #
+########################
+dist/
+build/
+*.egg-info/
+coverage/
+htmlcov/
+.pytest_cache/
+
+########################
+#  OS junk             #
+########################
+.DS_Store
+Thumbs.db
+*.swp
+*.bak
+*.orig

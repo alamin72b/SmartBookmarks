@@ -1,0 +1,373 @@
+
+<!-- templates/bookmarks/category_detail.html -->
+{% extends "bookmarks/base.html" %}
+
+{% block title %}{{ category.name }}{% endblock %}
+
+{% block content %}
+<style>
+  .category-detail {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+  
+  .category-header {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(240, 147, 251, 0.1));
+    border-radius: 20px;
+    padding: 2.5rem 2rem;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(102, 126, 234, 0.2);
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+  }
+  
+  .category-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+  }
+  
+  .category-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+  
+  .category-stats {
+    font-size: 1.1rem;
+    color: #4a5568;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  
+  .content-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  .bookmarks-section {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .bookmarks-section::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(135deg, #667eea, #f093fb);
+  }
+  
+  .section-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid rgba(102, 126, 234, 0.1);
+  }
+  
+  .section-icon {
+    font-size: 2rem;
+    margin-right: 1rem;
+  }
+  
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0;
+  }
+  
+  .bookmarks-grid {
+    display: grid;
+    gap: 1rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .bookmark-card {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(240, 147, 251, 0.05));
+    border: 1px solid rgba(102, 126, 234, 0.2);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .bookmark-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(135deg, #667eea, #f093fb);
+    border-radius: 0 3px 3px 0;
+    transform: scaleY(0);
+    transition: transform 0.3s ease;
+  }
+  
+  .bookmark-card:hover::before {
+    transform: scaleY(1);
+  }
+  
+  .bookmark-card:hover {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(240, 147, 251, 0.1));
+    border-color: rgba(102, 126, 234, 0.4);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+  }
+  
+  .bookmark-link {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: color 0.3s ease;
+  }
+  
+  .bookmark-link:hover {
+    color: #5a67d8;
+  }
+  
+  .bookmark-card:active {
+    transform: translateY(-1px);
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: rgba(102, 126, 234, 0.05);
+    border-radius: 12px;
+    border: 1px dashed rgba(102, 126, 234, 0.3);
+  }
+  
+  .empty-state-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.6;
+  }
+  
+  .empty-state h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #4a5568;
+  }
+  
+  .empty-state p {
+    color: #6b7280;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+  }
+  
+  .empty-state-suggestions {
+    background: rgba(102, 126, 234, 0.05);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .empty-state-suggestions h4 {
+    color: #1a1a2e;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  
+  .empty-state-suggestions ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    color: #4a5568;
+    font-size: 0.9rem;
+  }
+  
+  .empty-state-suggestions li {
+    margin-bottom: 0.25rem;
+  }
+  
+  .actions-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .action-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+  
+  .action-button {
+    width: 100%;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  
+  .add-category-button {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+  }
+  
+  .add-category-button:hover {
+    background: linear-gradient(135deg, #5a67d8, #6b46c1);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+  }
+  
+  .delete-form {
+    margin-top: auto;
+  }
+  
+  .delete-button {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+  }
+  
+  .delete-button:hover {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+  }
+  
+  @media (max-width: 768px) {
+    .category-header {
+      padding: 2rem 1rem;
+    }
+    
+    .category-title {
+      font-size: 2rem;
+    }
+    
+    .category-stats {
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    
+    .content-grid {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+    
+    .bookmarks-section {
+      padding: 1.5rem;
+    }
+    
+    .section-header {
+      margin-bottom: 1rem;
+    }
+    
+    .bookmark-card {
+      padding: 1rem;
+    }
+    
+    .bookmark-link {
+      font-size: 1rem;
+    }
+  }
+</style>
+
+<div class="category-detail">
+  <div class="category-header">
+    <h1 class="category-title">📁 {{ category.name }}</h1>
+    <div class="category-stats">
+      <span>📊 {{ bookmarks|length }} bookmark{{ bookmarks|length|pluralize }}</span>
+    </div>
+  </div>
+
+  <div class="content-grid">
+    <div class="bookmarks-section">
+      <div class="section-header">
+        <span class="section-icon">📚</span>
+        <h2 class="section-title">Bookmarks</h2>
+      </div>
+      
+      {% if bookmarks %}
+        <ul class="bookmarks-grid">
+          {% for bookmark in bookmarks %}
+            <li class="bookmark-card">
+              <a href="{% url 'bookmark_detail' bookmark.id %}" class="bookmark-link">
+                🔖 {{ bookmark.title }}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="empty-state">
+          <div class="empty-state-icon">📭</div>
+          <h3>No Bookmarks Yet</h3>
+          <p>This category doesn't have any bookmarks yet.</p>
+          
+          <div class="empty-state-suggestions">
+            <h4>💡 Get Started:</h4>
+            <ul>
+              <li>• Create a new bookmark and assign it to this category</li>
+              <li>• Edit existing bookmarks to add them here</li>
+              <li>• Import bookmarks from your browser</li>
+            </ul>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="actions-sidebar">
+      <div class="action-card">
+        <a href="{% url 'add_category' %}" class="action-button add-category-button">
+          ➕ Add New Category
+        </a>
+        
+        <form method="POST" action="{% url 'delete_category' category.id %}" class="delete-form" onsubmit="return confirm('Are you sure you want to delete this category? This action cannot be undone.')">
+          {% csrf_token %}
+          <button type="submit" class="action-button delete-button">
+            🗑️ Delete Category
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96a6d6e614dc4e9f',t:'MTc1NDQwMjYyMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>

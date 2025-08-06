@@ -1,0 +1,264 @@
+
+<!-- templates/bookmarks/confirm_delete_category.html -->
+{% extends "bookmarks/base.html" %}
+
+{% block title %}Delete Category{% endblock %}
+
+{% block content %}
+<style>
+  .delete-confirmation {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+  
+  .warning-header {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1));
+    border-radius: 20px;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .warning-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #ef4444, #dc2626, #b91c1c);
+  }
+  
+  .warning-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    color: #ef4444;
+  }
+  
+  .warning-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #dc2626;
+    margin-bottom: 1rem;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+  
+  .warning-subtitle {
+    font-size: 1.1rem;
+    color: #7f1d1d;
+    line-height: 1.6;
+  }
+  
+  .confirmation-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 2.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .confirmation-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    border-radius: 0 4px 4px 0;
+  }
+  
+  .category-info {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.05), rgba(220, 38, 38, 0.05));
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+  
+  .category-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  
+  .danger-warning {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1));
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .danger-text {
+    color: #7f1d1d;
+    font-weight: 600;
+    font-size: 1rem;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  
+  .action-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .delete-button {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+    position: relative;
+    overflow: hidden;
+    min-width: 180px;
+  }
+  
+  .delete-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    transition: left 0.3s ease;
+    z-index: -1;
+  }
+  
+  .delete-button:hover::before {
+    left: 0;
+  }
+  
+  .delete-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+  }
+  
+  .delete-button:active {
+    transform: translateY(0);
+  }
+  
+  .cancel-button {
+    background: linear-gradient(135deg, #6b7280, #4b5563);
+    color: white;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 150px;
+    box-shadow: 0 4px 15px rgba(107, 114, 128, 0.3);
+  }
+  
+  .cancel-button:hover {
+    background: linear-gradient(135deg, #4b5563, #374151);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(107, 114, 128, 0.4);
+    text-decoration: none;
+    color: white;
+  }
+  
+  .cancel-button:active {
+    transform: translateY(0);
+  }
+  
+  @media (max-width: 768px) {
+    .warning-header {
+      padding: 2rem 1rem;
+    }
+    
+    .warning-title {
+      font-size: 1.5rem;
+    }
+    
+    .confirmation-card {
+      padding: 1.5rem;
+      margin: 0 1rem;
+    }
+    
+    .action-buttons {
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .delete-button,
+    .cancel-button {
+      width: 100%;
+      max-width: 250px;
+    }
+    
+    .category-title {
+      font-size: 1.1rem;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+  }
+</style>
+
+<div class="delete-confirmation">
+  <div class="warning-header">
+    <div class="warning-icon">⚠️</div>
+    <h1 class="warning-title">Delete Category?</h1>
+    <p class="warning-subtitle">This action cannot be undone</p>
+  </div>
+
+  <div class="confirmation-card">
+    <div class="category-info">
+      <div class="category-title">
+        📁 {{ category.name }}
+      </div>
+    </div>
+
+    <div class="danger-warning">
+      <p class="danger-text">
+        🚨 This will permanently delete all bookmarks within this category
+      </p>
+    </div>
+
+    <form method="POST">
+      {% csrf_token %}
+      <div class="action-buttons">
+        <button type="submit" class="delete-button">
+          🗑️ Yes, Delete Category
+        </button>
+        <a href="{% url 'category_detail' category.id %}" class="cancel-button">
+          ↩️ Cancel
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96a6da6f04454e9f',t:'MTc1NDQwMjc2Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>

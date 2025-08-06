@@ -1,0 +1,515 @@
+
+{% extends "bookmarks/base.html" %}
+
+{% block title %}Search{% endblock %}
+
+{% block content %}
+<style>
+  .search-hero {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(240, 147, 251, 0.1));
+    border-radius: 20px;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(102, 126, 234, 0.2);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .search-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+  }
+  
+  .search-hero h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+    letter-spacing: -0.02em;
+  }
+  
+  .search-hero p {
+    font-size: 1.1rem;
+    color: #4a5568;
+    max-width: 500px;
+    margin: 0 auto 2rem;
+    line-height: 1.6;
+  }
+  
+  .search-form {
+    max-width: 600px;
+    margin: 0 auto;
+    position: relative;
+  }
+  
+  .search-input-container {
+    position: relative;
+    display: flex;
+    background: white;
+    border-radius: 50px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 2px solid rgba(102, 126, 234, 0.2);
+    transition: all 0.3s ease;
+    overflow: hidden;
+  }
+  
+  .search-input-container:focus-within {
+    border-color: #667eea;
+    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.2);
+    transform: translateY(-2px);
+  }
+  
+  .search-icon {
+    position: absolute;
+    left: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6b7280;
+    font-size: 1.2rem;
+    z-index: 2;
+  }
+  
+  .search-input {
+    flex: 1;
+    padding: 1rem 1rem 1rem 3.5rem;
+    border: none;
+    outline: none;
+    font-size: 1.1rem;
+    background: transparent;
+    color: #1a1a2e;
+  }
+  
+  .search-input::placeholder {
+    color: #9ca3af;
+  }
+  
+  .search-button {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 0 50px 50px 0;
+  }
+  
+  .search-button:hover {
+    background: linear-gradient(135deg, #5a67d8, #6b46c1);
+  }
+  
+  .search-results {
+    margin-top: 2rem;
+  }
+  
+  .results-header {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  }
+  
+  .results-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin-bottom: 0.5rem;
+  }
+  
+  .results-count {
+    color: #6b7280;
+    font-size: 1rem;
+  }
+  
+  .results-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1.5rem;
+  }
+  
+  .result-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .result-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(135deg, #667eea, #f093fb);
+    transform: scaleY(0);
+    transition: transform 0.3s ease;
+  }
+  
+  .result-card:hover::before {
+    transform: scaleY(1);
+  }
+  
+  .result-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  }
+  
+  .result-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    text-decoration: none;
+    display: block;
+    margin-bottom: 1rem;
+    transition: color 0.3s ease;
+  }
+  
+  .result-title:hover {
+    color: #667eea;
+  }
+  
+  .result-description {
+    color: #4a5568;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+  }
+  
+  .result-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(102, 126, 234, 0.1);
+  }
+  
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .meta-label {
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.9rem;
+  }
+  
+  .meta-link {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0.25rem 0.75rem;
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: 20px;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+  }
+  
+  .meta-link:hover {
+    background: rgba(102, 126, 234, 0.2);
+    transform: translateY(-1px);
+  }
+  
+  .attachments-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .attachment-item {
+    background: linear-gradient(135deg, rgba(240, 147, 251, 0.1), rgba(102, 126, 234, 0.1));
+    border: 1px solid rgba(240, 147, 251, 0.3);
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
+  }
+  
+  .attachment-item:hover {
+    background: linear-gradient(135deg, rgba(240, 147, 251, 0.2), rgba(102, 126, 234, 0.2));
+    transform: translateY(-1px);
+  }
+  
+  .attachment-link {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .pagination {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    margin-top: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+  
+  .step-links {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  
+  .step-links a {
+    color: #667eea;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(102, 126, 234, 0.2);
+  }
+  
+  .step-links a:hover {
+    background: rgba(102, 126, 234, 0.1);
+    transform: translateY(-1px);
+  }
+  
+  .current {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+  
+  .empty-state-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.6;
+  }
+  
+  .empty-state h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #4a5568;
+  }
+  
+  .empty-state p {
+    color: #6b7280;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+  }
+  
+  .empty-state-suggestions {
+    background: rgba(102, 126, 234, 0.05);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .empty-state-suggestions h4 {
+    color: #1a1a2e;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  
+  .empty-state-suggestions ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    color: #4a5568;
+    font-size: 0.9rem;
+  }
+  
+  .empty-state-suggestions li {
+    margin-bottom: 0.25rem;
+  }
+  
+  @media (max-width: 768px) {
+    .search-hero {
+      padding: 2rem 1rem;
+    }
+    
+    .search-hero h1 {
+      font-size: 2rem;
+    }
+    
+    .search-input-container {
+      flex-direction: column;
+      border-radius: 12px;
+    }
+    
+    .search-button {
+      border-radius: 0 0 12px 12px;
+    }
+    
+    .result-card {
+      padding: 1.5rem;
+    }
+    
+    .result-meta {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+    
+    .step-links {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+  }
+</style>
+
+<div class="search-hero">
+  <h1>🔍 Search Bookmarks</h1>
+  <p>Find your saved bookmarks quickly with our powerful search engine</p>
+  
+  <!-- Search form -->
+  <form method="get" class="search-form">
+    <div class="search-input-container">
+      <span class="search-icon">🔍</span>
+      <input 
+        type="text" 
+        name="q" 
+        value="{{ query|default:'' }}" 
+        placeholder="Search bookmarks, descriptions, URLs..."
+        class="search-input"
+        autocomplete="off"
+      >
+      <button type="submit" class="search-button">Search</button>
+    </div>
+  </form>
+</div>
+
+<div class="search-results">
+  {% if query %}
+    <div class="results-header">
+      <h2 class="results-title">Search Results</h2>
+      <div class="results-count">
+        {% if results %}
+          Found {{ results|length }} result{{ results|length|pluralize }} for "<strong>{{ query }}</strong>"
+        {% else %}
+          No results found for "<strong>{{ query }}</strong>"
+        {% endif %}
+      </div>
+    </div>
+    
+    {% if results %}
+      <ul class="results-list">
+        {% for bm in results %}
+          <li class="result-card">
+            <a href="{% url 'bookmark_detail' bm.id %}" class="result-title">{{ bm.title }}</a>
+            
+            {% if bm.description %}
+              <div class="result-description">
+                {{ bm.description|truncatewords:20 }}
+              </div>
+            {% endif %}
+            
+            <div class="result-meta">
+              {% if bm.url %}
+                <div class="meta-item">
+                  <span class="meta-label">🔗 URL:</span>
+                  <a href="{{ bm.url }}" target="_blank" class="meta-link">{{ bm.url|truncatechars:50 }}</a>
+                </div>
+              {% endif %}
+              
+              {% if bm.files.exists %}
+                <div class="meta-item">
+                  <span class="meta-label">📎 Attachments:</span>
+                  <ul class="attachments-list">
+                    {% for file in bm.files.all %}
+                      <li class="attachment-item">
+                        <a href="{{ file.file.url }}" target="_blank" class="attachment-link">
+                          📄 {{ file.file.name|truncatechars:20 }}
+                        </a>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                </div>
+              {% endif %}
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+
+      <!-- Pagination -->
+      {% if page_obj %}
+      <div class="pagination">
+        <div class="step-links">
+          {% if page_obj.has_previous %}
+            <a href="?q={{ query }}&page=1">&laquo; First</a>
+            <a href="?q={{ query }}&page={{ page_obj.previous_page_number }}">Previous</a>
+          {% endif %}
+          
+          <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+          </span>
+
+          {% if page_obj.has_next %}
+            <a href="?q={{ query }}&page={{ page_obj.next_page_number }}">Next</a>
+            <a href="?q={{ query }}&page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+    
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-state-icon">🔍</div>
+        <h3>No Results Found</h3>
+        <p>We couldn't find any bookmarks matching "<strong>{{ query }}</strong>"</p>
+        
+        <div class="empty-state-suggestions">
+          <h4>💡 Search Tips:</h4>
+          <ul>
+            <li>• Try different keywords or phrases</li>
+            <li>• Check your spelling</li>
+            <li>• Use broader search terms</li>
+            <li>• Search for partial words or phrases</li>
+          </ul>
+        </div>
+      </div>
+    {% endif %}
+  {% endif %}
+</div>
+
+{% endblock %}

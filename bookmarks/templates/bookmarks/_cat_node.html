@@ -1,0 +1,144 @@
+
+<style>
+  .category-node {
+    background: linear-gradient(135deg, rgba(240, 147, 251, 0.08), rgba(102, 126, 234, 0.08));
+    border-radius: 10px;
+    margin-bottom: 0.75rem;
+    border: 1px solid rgba(240, 147, 251, 0.2);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .category-node::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(135deg, #f093fb, #667eea);
+    transform: scaleY(0);
+    transition: transform 0.3s ease;
+  }
+  
+  .category-node:hover::before {
+    transform: scaleY(1);
+  }
+  
+  .category-node:hover {
+    background: linear-gradient(135deg, rgba(240, 147, 251, 0.15), rgba(102, 126, 234, 0.15));
+    border-color: rgba(240, 147, 251, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(240, 147, 251, 0.2);
+  }
+  
+  .category-link {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    text-decoration: none;
+    color: #1a1a2e;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: color 0.3s ease;
+    position: relative;
+  }
+  
+  .category-link::before {
+    content: '📁';
+    margin-right: 0.75rem;
+    font-size: 1.2rem;
+    transition: transform 0.3s ease;
+  }
+  
+  .category-link:hover::before {
+    transform: scale(1.1);
+  }
+  
+  .category-link:hover {
+    color: #667eea;
+  }
+  
+  .category-children {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 0.5rem 2rem;
+    position: relative;
+  }
+  
+  .category-children::before {
+    content: '';
+    position: absolute;
+    left: 1.5rem;
+    top: 0;
+    bottom: 0.5rem;
+    width: 2px;
+    background: linear-gradient(180deg, rgba(240, 147, 251, 0.3), transparent);
+  }
+  
+  .category-children .category-node {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(240, 147, 251, 0.05));
+    border-color: rgba(102, 126, 234, 0.15);
+    margin-bottom: 0.5rem;
+  }
+  
+  .category-children .category-link {
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+  }
+  
+  .category-children .category-link::before {
+    content: '📂';
+    font-size: 1rem;
+  }
+  
+  .category-children .category-node:hover {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(240, 147, 251, 0.1));
+    border-color: rgba(102, 126, 234, 0.3);
+  }
+  
+  /* Third level nesting */
+  .category-children .category-children .category-node {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.03), rgba(240, 147, 251, 0.03));
+    border-color: rgba(102, 126, 234, 0.1);
+  }
+  
+  .category-children .category-children .category-link {
+    padding: 0.6rem 0.75rem;
+    font-size: 0.9rem;
+  }
+  
+  .category-children .category-children .category-link::before {
+    content: '🗂️';
+    font-size: 0.9rem;
+  }
+  
+  @media (max-width: 768px) {
+    .category-children {
+      padding-left: 1rem;
+    }
+    
+    .category-link {
+      padding: 0.75rem 1rem;
+      font-size: 0.95rem;
+    }
+    
+    .category-children .category-link {
+      padding: 0.6rem 0.75rem;
+      font-size: 0.9rem;
+    }
+  }
+</style>
+
+<li class="category-node">
+  <a href="{% url 'category_detail' node.id %}" class="category-link">{{ node.name }}</a>
+  {% if node.children.exists %}
+    <ul class="category-children">
+      {% for child in node.children.all %}
+        {% include "bookmarks/_cat_node.html" with node=child %}
+      {% endfor %}
+    </ul>
+  {% endif %}
+</li>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96a68b80f1883378',t:'MTc1NDM5OTUzNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>

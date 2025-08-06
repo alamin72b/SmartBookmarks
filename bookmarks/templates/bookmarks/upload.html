@@ -1,0 +1,333 @@
+
+{% extends "bookmarks/base.html" %}
+
+{% block title %}Add Bookmark{% endblock %}
+
+{% block content %}
+<style>
+  .form-hero {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .form-hero h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+  }
+  
+  .form-hero p {
+    font-size: 1rem;
+    color: #6b7280;
+    margin: 0;
+  }
+  
+  .bookmark-form {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .form-section {
+    margin-bottom: 2rem;
+  }
+  
+  .section-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(102, 126, 234, 0.15);
+  }
+  
+  .section-icon {
+    font-size: 1.5rem;
+    margin-right: 0.75rem;
+  }
+  
+  .section-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin: 0;
+  }
+  
+  .form-field {
+    margin-bottom: 1.25rem;
+  }
+  
+  .form-field label {
+    display: block;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+  }
+  
+  .form-field input,
+  .form-field textarea,
+  .form-field select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid rgba(102, 126, 234, 0.3);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    background: white;
+    transition: all 0.2s ease;
+    font-family: inherit;
+  }
+  
+  .form-field input:focus,
+  .form-field textarea:focus,
+  .form-field select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+  }
+  
+  .form-field textarea {
+    resize: vertical;
+    min-height: 80px;
+    line-height: 1.5;
+  }
+  
+
+  
+  .file-upload-area {
+    background: rgba(102, 126, 234, 0.05);
+    border: 2px dashed rgba(102, 126, 234, 0.3);
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.2s ease;
+    position: relative;
+    cursor: pointer;
+  }
+  
+  .file-upload-area:hover {
+    background: rgba(102, 126, 234, 0.1);
+    border-color: #667eea;
+  }
+  
+  .file-upload-area input[type="file"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 2;
+  }
+  
+  .file-upload-content {
+    pointer-events: none;
+    z-index: 1;
+    position: relative;
+  }
+  
+  .file-upload-text {
+    color: #4a5568;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+  
+  .file-upload-hint {
+    color: #6b7280;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+  
+  .file-upload-area.dragover {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(240, 147, 251, 0.15));
+    border-color: #667eea;
+    transform: scale(1.02);
+  }
+  
+  .submit-button {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 0.75rem 2rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+    margin: 1.5rem 0 0;
+  }
+  
+  .submit-button:hover {
+    background: linear-gradient(135deg, #5a67d8, #6b46c1);
+    transform: translateY(-1px);
+  }
+  
+  /* Django form field styling */
+  .form-section p {
+    margin-bottom: 1.25rem;
+  }
+  
+  .form-section p label {
+    display: block;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+  }
+  
+  .form-section p input,
+  .form-section p textarea,
+  .form-section p select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid rgba(102, 126, 234, 0.3);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    background: white;
+    transition: all 0.2s ease;
+    font-family: inherit;
+  }
+  
+  .form-section p input:focus,
+  .form-section p textarea:focus,
+  .form-section p select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+  }
+  
+  @media (max-width: 768px) {
+    .form-hero h1 {
+      font-size: 1.75rem;
+    }
+    
+    .bookmark-form {
+      padding: 1.5rem;
+      margin: 0 1rem;
+    }
+    
+    .section-header {
+      margin-bottom: 0.75rem;
+    }
+    
+    .file-upload-area {
+      padding: 1rem;
+    }
+  }
+</style>
+
+<div class="form-hero">
+  <h1>📝 Create New Bookmark</h1>
+  <p>Add a new bookmark to your collection with optional files and multiple URLs</p>
+</div>
+
+<form method="post" enctype="multipart/form-data" class="bookmark-form">
+  {% csrf_token %}
+  
+  <!-- Main Bookmark Details -->
+  <div class="form-section">
+    <div class="section-header">
+      <span class="section-icon">📝</span>
+      <h2 class="section-title">Bookmark Details</h2>
+    </div>
+    {{ form.as_p }}
+  </div>
+
+  <!-- Multiple URLs Section -->
+  <div class="form-section multiple-urls-field">
+    <div class="section-header">
+      <span class="section-icon">🔗</span>
+      <h2 class="section-title">Additional URLs</h2>
+    </div>
+    <div class="form-field">
+      <label for="id_links">Related URLs (optional)</label>
+      <textarea 
+        name="links" 
+        id="id_links"
+        rows="4" 
+        placeholder="Add one URL per line&#10;https://example1.com&#10;https://example2.com&#10;https://example3.com"
+      ></textarea>
+      <small style="color: #6b7280; font-size: 0.9rem; margin-top: 0.5rem; display: block;">
+        💡 Add related links that complement your main bookmark
+      </small>
+    </div>
+  </div>
+
+  <!-- File Upload Section -->
+  <div class="form-section">
+    <div class="section-header">
+      <span class="section-icon">📎</span>
+      <h2 class="section-title">Attach Files</h2>
+    </div>
+    <div class="file-upload-area" onclick="document.getElementById('files').click()">
+      <input type="file" name="files" id="files" multiple>
+      <div class="file-upload-content">
+        <div class="file-upload-text">📁 Choose files to attach</div>
+        <div class="file-upload-hint">Click here or drag and drop files<br>Multiple files supported</div>
+      </div>
+    </div>
+    <div id="file-list" style="margin-top: 1rem; color: #4a5568; font-size: 0.9rem;"></div>
+  </div>
+
+  <button type="submit" class="submit-button">
+    💾 Save Bookmark
+  </button>
+</form>
+
+<script>
+  // File upload functionality
+  const fileInput = document.getElementById('files');
+  const fileList = document.getElementById('file-list');
+  const uploadArea = document.querySelector('.file-upload-area');
+  
+  // Handle file selection
+  fileInput.addEventListener('change', function(e) {
+    displaySelectedFiles(e.target.files);
+  });
+  
+  // Handle drag and drop
+  uploadArea.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    uploadArea.classList.add('dragover');
+  });
+  
+  uploadArea.addEventListener('dragleave', function(e) {
+    e.preventDefault();
+    uploadArea.classList.remove('dragover');
+  });
+  
+  uploadArea.addEventListener('drop', function(e) {
+    e.preventDefault();
+    uploadArea.classList.remove('dragover');
+    fileInput.files = e.dataTransfer.files;
+    displaySelectedFiles(e.dataTransfer.files);
+  });
+  
+  // Display selected files
+  function displaySelectedFiles(files) {
+    if (files.length === 0) {
+      fileList.innerHTML = '';
+      return;
+    }
+    
+    let fileNames = Array.from(files).map(file => 
+      `<span style="display: inline-block; background: rgba(102, 126, 234, 0.1); padding: 0.25rem 0.75rem; border-radius: 15px; margin: 0.25rem; border: 1px solid rgba(102, 126, 234, 0.2);">📄 ${file.name}</span>`
+    ).join('');
+    
+    fileList.innerHTML = `<div style="margin-top: 0.5rem;"><strong>Selected files:</strong><br>${fileNames}</div>`;
+  }
+</script>
+
+{% endblock %}
